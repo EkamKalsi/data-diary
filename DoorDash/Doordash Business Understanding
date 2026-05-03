@@ -1,0 +1,67 @@
+Doordash problem and needs:
+- people want food from places that dont deliver
+- restaurants want more customers, but cant afford to hire drivers all the time
+- drivers want flexible income without full time commitment
+
+Doordash:
+- shared delivery network serving all three groups
+- cost of operations is spread across the orders
+
+3-sided marketplace:
+- Consumer
+- Merchant
+- Dasher
+
+Merchants prefer to be on Doordash rather than hiring drivers, as that turns out to be expensive.
+
+Deeper goal: building the local commerce platform. not just food, but anything that can be delivered from a local business. Logistics layer of physical world
+
+Business operation:
+- consumer places the order -> merchant receives the order -> dispatch a dasher -> dasher picks up and delivers -> post delivery consumer can rate or ask for help
+
+Revenue streams:
+- Commission from merchants: Merchants pay DoorDash a percentage of every order. largest revenue source
+- Delivery and service fees: consumers pay delivery and service fee. 
+- Dashpass: subscription product, free delivery + reduced fees
+- Advertising: Merchants pay to appear higher in search results or promotional placements
+- Dashmart: own dark stores, margin on customers buying from here
+
+Dasher management:
+- independent contractors, not employers
+- dynamic pricing to incentivize dashers to work during high demand periods
+- batching where dahsers pick from multiple restaurants. improves cost and earnings for dasher, but longer time for consumer. so tradeoff to manage
+
+DoorDash became popular by focusing on suburban markets which competitors deprioritized
+
+Key Metrics:
+- Most important: Gross Order Value: total $ value of orders placed on platform
+      (why dont we we include other revenue drivers here?)
+- GOV = #Orders*Average Order Value
+
+Consumer Metrics:
+- MAU/DAU for platform health
+- Order frequency + retention for engagement, habit formation and acquistion quality
+- AOV: Revenue per transaction
+- DashPass attach rate
+- Churn rate
+- LTV
+
+Merchant Metrics:
+- % of local restaurants available
+- monthly merchant volume
+- merchant retention
+- order volume per merchant
+- fulfillment rate: % of orders accepted vs cancelled
+
+Dasher metrics:
+- Dasher utilization: % of dashing time spten on active deliveries -> unit economics
+- earnings per hour-> satisfaction
+- deliveries per hour -> throughput
+
+Platform metrics:
+- Delivery time end to end
+- % of deliveries within estimated window
+- % of orders that dont complete
+- take rate: monetization efficiency
+- CM: GOV - (Dasher pay+merchat take+ refunds)
+
