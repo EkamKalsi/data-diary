@@ -193,6 +193,24 @@ The consumer growth team comes to you: *"We want to test removing the delivery f
 
 ---
 
+### Q-S5 — Regression to the Mean
+
+**Prompt:**
+The ops team identified the **10 worst-performing markets** by consumer NPS last quarter. They ran an 8-week targeted improvement program in those markets — better Dasher training, faster issue resolution, proactive outreach.
+
+At the end of 8 weeks, average NPS in those 10 markets improved by **12 points**. The ops lead sends a company-wide email declaring the program a success and asking to roll it out to all markets.
+
+Should you sign off on that? What's your concern?
+
+#### My Answer
+- regression to the mean in play here, we take the worst eprforming groups, perform an intervetion and note an improvement
+- the reason these markets are worst performing markets because they are bad quality+bad luck
+- there is chance that these markets would have reverted the bad luck and imporved naturally, however we note all imporvments to program which is incorret, hence no sign off
+- if we were to do this, we should launch an experiment/phased rollout where we conduct porgam on a randomized set and then compare it against the ones who dont get it
+- essentially, the programs might ahve been actually good, but right now its a measurement problem
+
+---
+
 ### Q-S1 — Sample Size & Power
 
 **Prompt:**
@@ -455,3 +473,80 @@ That's the full ask. Where do you start?
 - Frame the downstream business risk: new Dasher churn today = supply hole in urban markets 6–12 months from now, which collapses the same consumer experience the matching change was protecting
 - "Orders completed in first week" is the leading indicator for 4-week churn — always identify the leading indicator for the lagging metric; this would have caught the problem during the experiment window before ship
 - Make recommendations surgical: rather than "revert everything," propose a targeted intervention — guarantee a minimum order floor for Dashers in their first 10 deliveries (new Dasher activation boost), keeping experienced Dasher priority intact; then experiment before shipping
+
+
+
+---
+
+## Q5 — Marketplace Health
+
+**Prompt:**
+The CEO is reviewing last quarter's numbers for the top 20 markets. Three things stand out:
+
+- **GOV up 18% YoY** — strong growth
+- **Consumer NPS down 4 points YoY**
+- **Dasher earnings per hour down 8% YoY**
+
+She turns to you and asks: *"Is our marketplace healthy?"*
+
+How do you answer that?
+
+### Clarifying Questions
+- How do we define healthy?
+    - for a three-sided marketplace like DoorDash, healthy means the growth is sustainable — all three sides (consumers, Dashers, merchants) are getting enough value to stay engaged. A marketplace that's growing GOV by extracting value from one side to benefit another is not healthy; it's eating its own seed corn.
+- what is the context here? what is the CEO trying to do here?
+    - On context: The CEO is about to present to the board next week. She wants to know if the 18% GOV growth is something to celebrate, or if it's masking structural problems that will catch up with the business. She's not asking for an academic answer — she needs a clear yes/no with the evidence behind it.
+
+
+### My Answer
+- Definitely a few pitfalls here to think about:
+    - why only look at top 20 markets?
+    - this is my first reaction
+- But assuming that is what we have to work with and it gets most of our value
+- GOV growing is a good sign, but just by itself doesnt tell the full story, especially given NPS being down and dasher earnings also down
+- Worry here is that GOV might have icnreased YoY, but the NPS being down and dasher earnings reducing is an early sign of things to come and growth actually slowing
+- GOV going up could be a function of customer acquistion working well,
+- However, NPPS going down shows signs of retention problem
+    - Have we observed our 30/60/90D retention being down?
+    - Has out LTV decreased?
+- Same for dashers, their earnings are decreasing
+    - This could be a sign of less orders being present i.e low demand
+    - and hence, dashers might also start churning out of the system
+- Possible hypothesis on this set of metric movement:
+    - Poor customer acquistion: we are acuiring users who only make one order and never come back and leave bad reviews
+    - Poor Product experience after first order: First order funnel looks healthy, but repeat order looks bad, leading to bad NPS
+    - and these users dont tip
+- The above two hypothesis lead to a big increase in total number of orders, eading to increase in GOV, but NPS and earnings being down since they are more dependent on quality and repetition of orders
+- to confirm this we can look at a few metrics:
+    - repeat orders: monthly/weekly cohort of customers who place an order in that time and then % of those who place repeat orders. compare this YoY
+    - orders per consumer, monthly level, comapre YoY
+    - NPS broken down by one time consumer orders vs repeat orders, compared YoY
+    - Avg. tip per order broken down by one time consumer orders vs repeat orders, compared YoY
+    - Mix-shift monhly level one-time orders vs repeat orders
+    - In all of these we are trying to validate if one time orders have seen peaks this year and hence driving the NPS and earnings down
+- If the above pans out to be true, we should inform the CEO, that we have mix-shift this year to one-time order consumers due to poor acquistion, leading to high GOV but downwards movements to NPS and Dasher Earnings
+- If this continues, we could see churn in consumer and dasher side both which would lead to GOV decrease as well
+- Recommendation is to improve:
+    - acquistion quality
+    - focus on retention rather than optimizing for first order
+    - acquire customers focused on retention vs first time orders
+    - this tradeoff is on % of first time orders vs 60D or 90D retention in short temr but eventually LTV
+- Nuanced answer: Marketplace in this year shows strong GOV growth backed by acquistion efforts focused on first time order consumers, but there are red flags when it comes to retaining those users
+
+    
+### Feedback
+
+**Overall: 8.5 / 10**
+
+| Dimension | Score | Note |
+|---|---|---|
+| Situation assessment | 1.5/2 | Correctly framed GOV growth as masking quality deterioration on both sides; downstream GOV risk arrived mid-analysis rather than being flagged upfront |
+| Clarifying questions | 1.5/2 | Top-20 bias catch and retention/LTV questions were strong; missed asking about acquisition channel mix (promos vs. organic) — that would have pointed to the hypothesis faster |
+| Core hypothesis | 2/2 | Clean, parsimonious, and testable — one cause explains all three metrics simultaneously; the tip insight was the key unlock |
+| Metrics chosen | 2/2 | Repeat order cohorts, orders per consumer, NPS by segment, avg tip by segment, mix-shift — comprehensive and directly tied to the hypothesis |
+| Final recommendation | 1.5/2 | Nuanced CEO answer and acquisition/retention tradeoff were right; "improve acquisition quality" needs specific levers, and the recommendation lacks a forward-looking quantified framing |
+
+**Key takeaways:**
+- Ask about acquisition channels early — "are we running heavy promos?" is a single question that collapses the entire investigation; promo-driven users have a known profile: low retention, low tips, high churn
+- Quantify forward risk for the CEO: state what continued deterioration means in concrete GOV terms ("new cohorts worth 20% less in LTV → need proportionally more acquisition to sustain growth, compounding the problem")
+- Make recommendations specific: levers are (a) reduce promo depth so discount-seekers self-select out, (b) shift spend to channels with proven retention profiles, (c) add minimum order value before welcome offer applies — always state the tradeoff for each
