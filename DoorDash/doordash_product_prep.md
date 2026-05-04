@@ -270,6 +270,51 @@ Two-part question.
 
 ---
 
+### Q-S4 — Simpson's Paradox
+
+**Prompt:**
+You're analyzing order frequency for DashPass vs. non-DashPass consumers. The aggregate numbers look clear:
+
+- **DashPass members:** 2.1 orders/week on average
+- **Non-DashPass members:** 1.8 orders/week on average
+
+You bring this to your PM as evidence that DashPass drives higher engagement. Your skeptical colleague slices the data by market tier and sends you this back:
+
+| Market Tier | DashPass avg orders/week | Non-DashPass avg orders/week |
+|-------------|--------------------------|------------------------------|
+| Tier 1 (large cities) | 2.3 | 2.5 |
+| Tier 2 (mid cities) | 1.9 | 2.0 |
+| Tier 3 (small cities) | 1.4 | 1.6 |
+
+Non-DashPass members order more frequently in **every single tier** — yet DashPass members are higher in the aggregate. How do you explain this, and which number should your PM trust?
+
+#### My Answer
+- This is a classical case of Simpsons paradox where overall averages might differ from within segments
+- For each of these segments what could be happening is mix-shift difference. 
+- Metric in question = #orders per week/#consumers in the group
+- For each of the segment #dashpass consumers< #non-dashpass consumers
+- in smaller groups hence the non-dashpass group avg is higher, but on overall basis this changes
+- these numbers should be complemented by %of consumers in each group on overall and segmented population and the results will be clear
+
+#### Feedback
+
+**Overall: 4.5 / 10**
+
+| Dimension | Score | Note |
+|---|---|---|
+| Pattern recognition | 2/2 | Named Simpson's Paradox immediately and correctly — the hardest part, nailed it |
+| Mechanism accuracy | 1/2 | Right idea (mix-shift), but imprecise — it's not about group *size*, it's about *distribution across tiers* |
+| Answering the direct question | 0/2 | "Which number should your PM trust?" was explicitly asked and never answered |
+| Business implication | 0.5/2 | Didn't flag that this is a selection bias problem — DashPass is not *causing* higher order frequency |
+| Path forward | 1/2 | "Complement with % of consumers in each group" is the right direction but vague |
+
+**Key takeaways:**
+- The mechanism is about *distribution across tiers*, not group size: DashPass members are disproportionately in Tier 1 (where everyone orders more); non-DashPass spread across Tier 2/3. That Tier 1 concentration pulls up the DashPass aggregate — compare tier-weight breakdown to prove it
+- Always answer the direct question: within-tier numbers are more trustworthy because they hold the confounding variable (market tier) constant; the aggregate is misleading and the PM should not cite it as evidence DashPass drives engagement
+- Name the underlying problem: selection bias — high-frequency Tier 1 users self-select into DashPass; even within-tier is observational; only a randomized experiment can establish that DashPass *causes* higher order frequency
+
+---
+
 ### Q-S3 — Peeking & Early Stopping
 
 **Prompt:**
@@ -304,3 +349,109 @@ What do you tell them, and what's actually going on statistically?
 - Power is not the issue — if you're seeing p=0.02, you're detecting something; the detection itself isn't valid
 - Use the coin-flip analogy with PMs: stopping at 7/10 heads looks significant but reverts to 50/50 by flip 100
 - Valid solutions: (1) run to planned end, (2) sequential testing with adjusted thresholds, (3) Bayesian methods
+
+---
+
+## Q4 — Dasher Churn Spike
+
+**Prompt:**
+The VP of Dasher Supply pinged the data science team:
+
+> *"Dasher churn is up 15% over the last six weeks. I need to understand why, and I need a recommendation by end of week."*
+
+That's the full ask. Where do you start?
+
+### Clarifying Questions
+- What metric is being looked at here? and at what time interval?
+    - Churn in case of dashers can be defined as dashers who canceled their accounts/total active dashers
+    - But some clarification here?
+- Also, this is happening over last-sixe weeks, is this happening every week or 6 weeks ago to now? i.e the time period/interval question?
+- on the time interval and decline being YoY, is it the case that we are comparing recent 6 weeks mature for churn to their counterpart last year and noticing a 15% decline for each cohort?
+- Is there a week by week breakdown available?
+- Are there any macroeconomic or seasonality conditions which we are adjsuting for?
+- Is it fair to say that the denominator in this condition i.e number of dashers remain similar and there is not a sudden reduction of dashers which is aritifically causing the churn to increase?
+- Is it also fair to say that this is not a data reporting/events not being logged issue?
+- This seems like a matching system problem. Confirming did we make any changes to matching system?
+
+
+### Situation
+- Dasher Churn = #Dashers who didn't do a single delivery W+1 to W+4 weeks following their last delivery/#Dashers who did a delivery in week W
+- aggregated churn for recent 6 weeks this year vs last year same time is 15% down
+- Churn = (#Dashers with no delivery for 4 consecutive weeks)/(#Dashers with delivery in W0)
+- WoW breakdown, trend is building up every week. W1 -> 8%, W6 -> 22% up
+- Pool of dashers available has increase, and churn too, that means definitely numerator has icnreased
+- New dashers are seeing increased churn
+- New dashers in urban areas seeing churn
+- Main reason being new dashers are getting less orders
+- order volume is up
+- active dashers are up as well
+- orders per dasher is down meaningfully
+
+### Hypothesis
+- Decision: churn is happening, it's YoY, which controls for seasonality. It's building WoW, asking to investigate and come up with a recommendation
+- Confirm where is churn coming from?
+    - Market segment: Urban vs sub-urban
+    - Dasher segment: New vs retained dashers
+- Prioriting dasher segment to understand if new dashers are churning out or retained dashers
+    - For all dashers in this time period of 6 weeks, this year vs last year
+    - Segment dashers into
+        - New: 1-5th delivery in the measurement week
+        - Med: 2-20th delivery in the measurement week
+        - Experienced: >21st delivery in the measurement week
+    - Identify which segment is churning the most
+    - If all segments have equal churn, has the mix-shift of dashers changed?
+- Identified new dashers are facing higher churn
+- Segment further:
+    - Are these new dashers churning more in urban or suburban areas?
+    - Are we seeing high fraud percentages in this cohort?
+- New dashers in urban markets facing churn, no fraud so genuine dashers
+- Possible hypothesis:
+    - Pricing changes?
+    - Lack of orders?
+    - Any macro-economic law/policy changes?
+    - Any product communications or bugs like problem with paying system or comms not delivering information etc?
+- Pricing changes leading to less earnings?
+    - Dasher Earning = Dasher tip + Commission
+    - Dasher tip, outside of platform control, but verify if volume has gone down, or avg. tip per order has reduced?
+    - Commission, dependent on platform?
+        - Has platform increase take rate taking from dasher earnings?
+        - Has the commission structure changed, where restaurant earnings are more?
+        - Unit economics per order can reveal this for the top 10 markets?
+        - Comapring against last year?
+- Lack of orders?
+    - Weekly basis, order volume, consumer volume and active dashers
+    - orders per dasher
+    - orders per consumer
+    - comparing against last year for the top 10 markets and observationally if the numbers have reduced
+- From the two hypothesis we can verify what could be a leading indicator for this
+- Orders per dasher being down is a good signal here
+- Recommendation:
+    - The matching system changes while successful for consumer experience and dasher utilization overall, did not help the new dashers
+    - Now these new dashers are churning out and we see that in YoY metrics and also probably in avg. delivery time metrics as supply might be struggling
+    - We should correctly evaluate the tradeoff here:
+        - Consumer experience i.e %orders within estimated window vs dasher churn rate
+        - Essentially, for each percentage of orders not delivered on time, how much churn we avoid
+        - Also, for those orders not delivered in time, how far away are in the window
+    - From here we can follow a few paths:
+        - At the current point we are optimizing on the consumer experience, in the short-term we can revert to old version of the matching algorithm
+        - In the meantime MLE team fixes the matching algorithm to also incorporate long term retention as one of the goals of the model
+
+
+### My Answer
+
+### Feedback
+
+**Overall: 7.5 / 10**
+
+| Dimension | Score | Note |
+|---|---|---|
+| Situation assessment | 1.5/2 | Correctly landed on matching algorithm as root cause; missing explicit framing of the downstream business risk and the cross-functional conflict between consumer and supply teams |
+| Clarifying questions | 1.5/2 | Best part of the answer — metric definition, denominator check, data quality, WoW breakdown, and the matching system question were all strong; missed asking about competing gig platforms or new Dasher acquisition campaigns |
+| Core hypothesis | 1.5/2 | Systematic elimination of pricing, macro, and bugs was methodical; slightly bottom-up rather than leading with a falsifiable top-down hypothesis |
+| Metrics chosen | 1.5/2 | Orders per Dasher and earnings decomposition were right; missing the key early-warning metric: orders completed in first week of activation (leading indicator for 4-week churn) |
+| Final recommendation | 1.5/2 | Tradeoff framing was good; revert + MLE fix is the right direction but too vague — missing a targeted intervention and experiment design for the fix |
+
+**Key takeaways:**
+- Frame the downstream business risk: new Dasher churn today = supply hole in urban markets 6–12 months from now, which collapses the same consumer experience the matching change was protecting
+- "Orders completed in first week" is the leading indicator for 4-week churn — always identify the leading indicator for the lagging metric; this would have caught the problem during the experiment window before ship
+- Make recommendations surgical: rather than "revert everything," propose a targeted intervention — guarantee a minimum order floor for Dashers in their first 10 deliveries (new Dasher activation boost), keeping experienced Dasher priority intact; then experiment before shipping
