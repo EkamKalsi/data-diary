@@ -405,7 +405,7 @@ That's the full ask. Where do you start?
 - active dashers are up as well
 - orders per dasher is down meaningfully
 
-### Hypothesis
+### My Answer
 - Decision: churn is happening, it's YoY, which controls for seasonality. It's building WoW, asking to investigate and come up with a recommendation
 - Confirm where is churn coming from?
     - Market segment: Urban vs sub-urban
@@ -454,8 +454,6 @@ That's the full ask. Where do you start?
         - At the current point we are optimizing on the consumer experience, in the short-term we can revert to old version of the matching algorithm
         - In the meantime MLE team fixes the matching algorithm to also incorporate long term retention as one of the goals of the model
 
-
-### My Answer
 
 ### Feedback
 
@@ -550,3 +548,197 @@ How do you answer that?
 - Ask about acquisition channels early — "are we running heavy promos?" is a single question that collapses the entire investigation; promo-driven users have a known profile: low retention, low tips, high churn
 - Quantify forward risk for the CEO: state what continued deterioration means in concrete GOV terms ("new cohorts worth 20% less in LTV → need proportionally more acquisition to sustain growth, compounding the problem")
 - Make recommendations specific: levers are (a) reduce promo depth so discount-seekers self-select out, (b) shift spend to channels with proven retention profiles, (c) add minimum order value before welcome offer applies — always state the tradeoff for each
+
+
+---
+
+## Q6 — Dynamic Dasher Pay Bump: Sign-off Ask
+
+**Topics:** experiment design, network effects / SUTVA, Dasher incentives, supply-side spillover
+**Time box:** 30 min case + 15 min Q&A
+
+**Prompt:**
+
+I'm a PM on the Marketplace Optimization team. We've been testing a new Dasher-side incentive:
+
+> *In zones where assignment latency rises above our threshold, we dynamically bump per-delivery pay by $1.50 for the next 30 minutes. The goal is to pull more supply online in the zones that need it most.*
+
+We've been running it for 10 days, randomized at the **individual Dasher** level — treatment Dashers see the bump in qualifying zones, control Dashers don't.
+
+Results look strong:
+- Treatment **EPAH up 8%** vs control
+- Treatment **4-week retention projecting +3pp** based on early signal
+- No significant change in delivery cost per order
+
+The team wants to ship this week. I'm asking for your sign-off as our DS partner. **What's your read?**
+
+### My Answer
+
+
+---
+
+## Q7 — Dasher Earnings Guarantee Evaluation
+
+**Topics:** difference-in-differences (DiD), causal inference without randomization, Dasher retention, supply-side incentives
+**Time box:** 30 min case + 15 min Q&A
+
+**Prompt:**
+Your head of Supply Analytics messages you:
+
+> "We rolled out a Dasher minimum earnings guarantee in 12 markets last quarter — if a Dasher's hourly earnings fall below $14/hr in a given shift, we top them up to $14. Finance is now asking whether the program actually improved D30 retention or just added cost. Problem is, we didn't run an experiment — leadership just shipped it to those markets directly. Can you figure out if this worked?"
+
+That's the full context.
+
+### Follow-ups/Clarifications
+- how do you define D30 retention here? Is it the percentage of dashers still dashing 30 days fter they were exposed to this offer/treatment?
+- Do all dashers in the 12 markets get this treatment?
+- what kind of markets were exposed to this? Asking for confounder effects?
+
+### Interviewer Response
+D30 retention definition: Yes — for each Dasher active in week W, we track whether they completed at least one delivery in weeks W+1 through W+4. A Dasher is retained if they do; churned if they don't. We measure this at the Dasher level, not the shift level.
+
+Do all Dashers in the 12 markets get it? Yes — the guarantee applies to every Dasher who completes at least one delivery in those markets during the quarter. There's no within-market holdout group. That's precisely why Finance is frustrated — they can't do a simple A/B comparison.
+
+What kind of markets were selected? That's a sharp question. The 12 markets were chosen by the ops team — they were mid-tier markets where Dasher EPAH had been trending below the $14 threshold most often over the prior quarter. In other words, these were markets where supply-side earnings were already under pressure. The remaining markets were generally healthier on EPAH.
+
+One thing I'll add unprompted: the 12 markets and the control markets had been trending differently on EPAH before the rollout. Whether that matters depends on how you set up your analysis — worth keeping in mind
+
+### My Answer
+The framework I am using here is the following:
+    - if the intervention wasn't applied the retention of these markets would have trended downwards, which I am assuming was already happening. Reason being, EPAH was going down
+    - We can observe quarterly retention for these 12 markets, classified as treatment
+    - Manufacture an artifical control, taking into account confounders like:
+        - market type: urban, suburban, rural
+        - EPAH(range groups)
+        - can make this list bigger depending on the depth of the analysis
+    - Now we observe the difference in retention for control vs treatment and attribute the incremental to the top-up/intervention
+    - My hypothesis is conducting a quarterly market level analysis would help us quantify this and check if the top-up was stat-sig
+    - Retention_Delta_market = constant + beta*treatment_effect(1 or 0)
+        - Retention_Delta_marke = 
+            (Treatment retention_post intervention - treatment retention_pre intervntion)
+            - 
+            (Control retention_post intervention - Control retention_pre intervntion)
+        - Treatment, Control are pairs of markets we can fetch via clustering on the two confounders above(market type, EPAH)
+            - Reason we are doing this is to control for the confounders which can conflate the retention metric
+            - each of the 2 markets would ahve a control counterpart obtained via nearest neighbors approach
+    - Since we have already controlled for confounders in the above pairing we dont need the confounders in this regression model
+    - the output of the regression model would give us the beta statistic and if it's positive and statsig we can claim the top-up was responsible for retention increase
+    Notes:
+        - we are conducing this analysis on quarterly level, it would be useful to perform a sanity check that the weekly cohort retention holds as well
+        - also, while retention in D30 can improve, we should also conduct a cost-ebefit analysis:
+            - if every percentage icnrease in retention pairs well with the cost of increased earnings
+
+### Follow-ups
+- Q1: Your analysis gives you a DiD estimate showing the guarantee improved D30 retention by, say, 2 percentage points. Finance then asks: "Great — but should we keep the program?" Walk me through the cost-benefit framing you'd use to answer that.
+    - 2% increase in retention means, we have 2% extra dashers at D30, we can translate this to monthly increase in dashers, which can translate to monthly increase in orders and revenue from that
+    - From the above revenue, we can factor in how much is cost now which has the extra top-up cost
+    - we cancalclate top-up cost/order and also extra revenue/margin per order
+    - if margin outweighs cost we are good
+    - do want to add nthat this could be just novelty effects and beneficial to conduct long term analysis if this holds
+
+- Q2: You've focused the whole analysis on the Dasher side. Before your head of Supply Analytics takes this to Finance, what would you want to check on the consumer and merchant side — and why does it matter for the recommendation?
+    - Fraud issues: Due to top-up offering extra money we should monitor fraud rates, because dashers might be tempted to conduct more deliveries or work in general?
+        - monitor user complaints, orders not delivered etc
+        - dashers not picking up order and hacing the system to be under 14$ deliberately
+    - Discount/Deals cut: There could be a possibility that the cist for this top-up goes from deals/promotions for consumers and marchants goes from promotiosn to consumers and merchants, in turn leading to churn on the other two sides
+    - Merchants: Since we have more dashers in the market now, merchants could be burdened by dashers arriving sooner and waiting leading to bad experience. Should monitor churn/complaints from merchant side
+
+- Q3 — last one: Leadership liked the results and wants to expand this guarantee to 20 more markets next quarter. How would you design the rollout so that this time you can actually measure the effect properly — what does a good experiment look like here?
+    - conducting a dasher level analysis now, where in these 20 markets we assign dashers to treatment or control once they finish an order
+    - the randomization controls for confounders,
+    - treatment variation is which receives top-ups
+        - since treatment dashers are likely to retain and do more deliveries they might influence orders for control group
+        - we control for this by randomizing less users in treatment, or randomization using clusters within market such that they dont influence each other
+    - end of the experiment our metric set would be:
+        - Primary metric: D30 retention at the end of the experiment
+        - Secondary metric: ETA per order, EPAH per dasher, margin per dasher
+        - Guardrail: Fraud rate(% dashers not completing orders)
+    - We run this experiment based on an MDE by intuition and bcuketing dashers till we achieve a desired sample size
+
+### Feedback
+
+**Overall: 6.5 / 10**
+
+| Dimension | Score | Note |
+|---|---|---|
+| Business / Product Intuition | 1.5/2 | Correctly tied EPAH decline → Dasher churn → guarantee rationale; cost-benefit direction right; missed supply→ETA→consumer chain proactively; guarantee cost vs. acquisition cost anchor only landed after prompting |
+| Structured Thinking | 1.5/2 | Clarifying questions were the strongest part — metric definition, all-market treatment, market-type-as-confounder were all sharp; parallel trends not flagged as the central assumption before diving into mechanics |
+| Depth of Solution | 1.5/2 | DiD 2x2 correctly articulated; nearest-neighbor matching on market type + EPAH is sound; SUTVA recognized in Q3; but parallel trends and regression to mean only surfaced when prompted; Q3 unit of randomization wrong (Dasher-level, not market-level) |
+| Organization & Clarity | 1/2 | Framework-first structure was clean; but most depth — parallel trends, regression to mean, 3-sided guardrails — came through probing rather than being driven proactively |
+
+**Key takeaways:**
+- **State parallel trends as your first assumption in any DiD.** Before the analysis: "The key assumption is that treatment and control markets would have trended similarly absent the intervention. I'll verify with a pre-trend check on retention in quarters before rollout." You knew it but only named it when pushed.
+- **Flag regression to mean immediately when markets are selected at their worst.** The moment you hear "markets selected because EPAH was below threshold," say: "Selection at the trough means some improvement is natural reversion — my DiD controls for this only if matched controls are also from the low-EPAH pool."
+- **For a market-wide policy, randomize at the market level.** The guarantee applies to every Dasher in a market — that's the natural unit. Dasher-level randomization within the same market violates SUTVA because they compete for the same order queue. Clean design: assign 10 of 20 markets to treatment, 10 to control, matched on EPAH and market type.
+
+---
+
+## Q8 — Peak Pay + Zone Assignment Overhaul
+
+**Topics:** network effects / SUTVA, experiment design, Peak Pay triggers, zone-level spillover, supply pooling
+**Time box:** 30 min case + 15 min Q&A
+
+**Prompt:**
+The assignment and supply teams are jointly proposing a change to how Peak Pay is triggered. Right now, when assignment latency in a zone crosses a threshold, Peak Pay activates immediately — a flat bonus paid to any Dasher who picks up an order in that zone for the next 30 minutes.
+
+The new proposal changes the sequence: before paying out Peak Pay, the algorithm first tries to borrow supply from adjacent zones by temporarily expanding the assignment radius. Only if that cross-zone pull fails to reduce latency within 5 minutes does Peak Pay activate.
+
+Backtests on 6 months of historical data show:
+- Peak Pay spend down 12%
+- On-time delivery rate up 2 points
+- Dasher EPAH flat
+
+The combined team wants to ship this week and is asking for your sign-off as the DS partner.
+
+### Clarifications/Follow-ups
+- how was back-testing conducted?
+    - which markets were used for the backtest?
+    - how do we simulate that assignment would have led to acceptance of order as well?
+    - on what time period are we measuring these metrics?
+- what is the aim for doing this?
+    - are we tryign to reduce spend? or reduce the time to deliver?
+
+### Interviewer Responses
+    How was the backtest run? It replayed 6 months of historical order and Dasher position logs from the top 50 US markets. When the simulation detects latency crossing the threshold, it first models the zone-expansion step — checks whether a Dasher in an adjacent zone was available and close enough to pick up the order within 5 minutes. If yes, it counts that as a successful cross-zone pull and no Peak Pay fires. If no eligible Dasher exists within that window, it falls back to Peak Pay as today.
+
+    The acceptance simulation question is sharp. The backtest assumes cross-zone Dashers would accept those offers at the same rate they accepted comparable in-zone offers historically. That assumption may not hold — worth keeping in mind.
+
+    What's the primary goal? Both, but ordered: the primary hypothesis is that zone expansion can resolve latency surges without the cost of Peak Pay in a meaningful fraction of cases, keeping on-time rate stable while cutting spend. The 12% reduction in spend and 2-point improvement in on-time rate are the headline results the team is leading with.
+
+    The 5-minute window before Peak Pay kicks in is a design choice — the team picked it based on historical data showing most cross-zone Dashers can reach the adjacent zone within that window during non-
+
+### My Answer
+    - The framework/problem here we are trying to understand is that, if we increase the radius of a high latency zone and borrow dashers, what is the overall effect to the system because of that?
+    - after confirming, we noted that the backtest just modeled the zone latency even independently and not as a network. This is incorrect as one zone's increase in on-time rate could lead to decrease in on-time rate for the neighboaring zone especially when we are borrowing dashers
+    - on-time rate is a function of active dashers per order, and assuming the denominator remains consistent here, our numerator decreases
+        - High latency zone: on-time rate increases, because active dashers per order increase
+        - The above leads to an on-time rate decrease in neighboring zones because active dashers decrease
+            - this triggers another latency zone, and the same thing repeats
+    - Since we did not model this network effect we cannot trust the current analysis
+
+### Experimental Plan
+    - randomization on market level
+    - primary ypothesis: does the new algorithm/logic lead to increase in on-rate deliveries with guardrail on peak pay spend per order/dasher?
+    - market level randomization ensures that we dont cause spillage and avoid SUTVA violations
+    - consumer side we should be able to see increase in ETA and UX leading to possible increase in NPS
+    - merchant side: same no delays in dhaser arrivals, and make sure we dont see any delays
+    - metrics: on-time rate, avg. eta per order, guardrail: peak pay as percentage of revenue, peak pay per order
+
+### Feedback
+
+**Overall: 6.5 / 10**
+
+| Dimension | Score | Note |
+|---|---|---|
+| Business / Product Intuition | 1.5/2 | Correctly identified the network spillover flaw as the core issue and named the cascade effect; EPAH flat anomaly only surfaced after prompting, and initial direction was wrong |
+| Structured Thinking | 1.5/2 | Clarifying questions on backtest methodology were sharp — especially the acceptance rate simulation question; logical flow from flaw identification → block ship → experiment |
+| Depth of Solution | 2/2 | Cascade dynamic (zone A borrows from B → B triggers Peak Pay → repeats) was well articulated; SUTVA violation correctly applied when rejecting zone-level experiment; market-level reasoning sound |
+| Organization & Clarity | 1/2 | Main case flow was clean; experiment plan was thin (no duration, no market matching, guardrails misframed); switchback answer had the right conclusion but wrong reasoning |
+
+**Key takeaways:**
+- **EPAH flat is a red flag — state it immediately, unprompted.** Cross-zone travel adds active hours without proportional earnings → EPAH should go DOWN. Flat EPAH means the backtest didn't model cross-zone transit time. That's your second reason to block sign-off alongside the zone independence problem.
+- **Switchback fails here due to carryover, not time-of-day.** Switchback handles time-of-day well — that's its strength. The real issue: when the ON window pulls Dashers to zone A, those Dashers are physically misplaced when you flip to OFF. Carryover contamination is the correct objection.
+- **Experiment plan needs four things:** (a) treatment/control definition; (b) market matching criteria (baseline on-time rate, Peak Pay frequency, market size); (c) duration — 4-6 weeks minimum to cover multiple peak cycles; (d) guardrails correctly framed — Peak Pay spend is the expected benefit, not a guardrail; real guardrails are Dasher EPAH and order cancellation rate.
+
+**Pacing:** ~35-40 min on the case, slightly over. Tighten the experiment design section to buy back time.
+

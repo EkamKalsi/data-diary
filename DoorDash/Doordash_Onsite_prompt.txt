@@ -1,0 +1,23 @@
+Update as of June 3, 2026
+
+I have been moved to the onsite round for Doordash. Thanks for the first round preparation.
+
+Now I am preparing for the next round of interview, the details for this are in:
+
+- Interview structure: /Users/ekampreetkalsy/data-diary/DoorDash/Ax Candidate Interview Prep Kit - Round 2 (4).pdf
+
+While the interviews wont be specific to the team, it's reasonable to expct one round to eb related to the team specific matching right now.
+
+The team I am currently interviewing for is:
+
+Dasher & Logistics
+The Dasher Logistics Data Science team’s mission is to create the most efficient and reliable logistics system while providing Dashers with the best gig platform experience. We do so by building a Dasher-first app that makes life better for Dasher to complete their tasks and reach their goals, improve the quality and efficiency of our logistics system to boost consumer growth, and lower delivery costs. As DoorDash’s demand diversifies, ensure our advantage in Logistics benefits every vertical by supplying the right Dasher for every delivery.
+
+Details for other teams can be found at: https://careersatdoordash.com/career-areas/analytics/
+
+They also provided me with some other preparation material:
+- /Users/ekampreetkalsy/data-diary/DoorDash/Working @ DoorDash (1).pdf
+
+Lets come up with a plan on how I can best prepare for this interview. If required come up with appropriate skills or anything else required to ace this interview
+The focus should be to understand the business, team, practice ambiguous case studies and relating it doen to mathematical and statistical frameworks.
+Along with practicing best things to say to prepare.

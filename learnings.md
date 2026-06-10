@@ -4,6 +4,22 @@ A running doc of tips and patterns from practice sessions. Add to this with `/ad
 
 ---
 
+## Weak Areas
+
+Topics scored below 7/10 in a recent session, or topics the candidate has flagged as shaky. `/interviewer-mode` should bias toward these first. Move topics out of this list once they hit 8+ on a subsequent attempt.
+
+| Topic | Source | Last score | Status |
+|---|---|---|---|
+| Simpson's Paradox / stratification vs randomization | Q-S4 (DoorDash) | 4.5/10 | active retry |
+| Peeking & early stopping / sequential testing | Q-S3 (DoorDash) | 5.5/10 | active retry |
+| New-user incentive design & long-term value framing | Q3 (DoorDash) | 6.5/10 | active retry |
+| Regression to the mean | Q-S5 (DoorDash) | unscored | needs feedback first |
+| Difference-in-differences (DiD) | Q7 (DoorDash) | 6.5/10 | active retry |
+| CUPED / variance reduction | gap in coverage | not practiced | needs first attempt |
+| Network effects / SUTVA in marketplace experiments | Q8 (DoorDash) | 6.5/10 | active retry |
+
+---
+
 ## SQL
 
 | Tip | Detail |
@@ -34,6 +50,8 @@ A running doc of tips and patterns from practice sessions. Add to this with `/ad
 | **Experiment window must cover metric window** | The experiment's runtime must be at least as long as the full observation window of every guardrail metric. If a churn metric needs 4 weeks to mature but the experiment runs for 3, churned users haven't been identified yet and the guardrail will pass silently. Always check: what is the latest a metric can signal harm, and does the experiment run long enough to observe it? |
 | **Pre-register subgroups; still correct for multiplicity** | Pre-registering subgroups (deciding before the experiment runs) means you're testing a hypothesis, not mining data — so post-hoc subgroup findings are hypotheses only. But pre-registration alone doesn't fix multiple testing: 10 pre-registered subgroups at α=0.05 still gives ~40% FWER. Limit pre-registered subgroups to 1–3 with real hypotheses, and apply Bonferroni or BH correction when you have more. |
 | **Regression to the mean needs a holdout** | Selecting extreme units (worst markets, lowest-rated Dashers) to intervene on means observed improvement is partly natural rebound, not just program effect — because observed value = true value + noise, and noise reverts. It's a measurement problem, not a "nothing works" claim: in a randomized experiment both groups revert equally, so the difference cancels out reversion and isolates the causal effect. Always keep a holdout even when targeting bad performers. |
+| **DiD: state parallel trends first** | Before doing any DiD mechanics, say out loud: "The central assumption is that treatment and control would have trended similarly absent the intervention — I'll verify this with a pre-period trend check." Skipping this makes the whole analysis look ungrounded. Also: when markets were selected at their worst (low EPAH, high churn), flag regression to the mean immediately — matched controls must come from the same low-performance pool or the DiD overstates the effect. |
+| **Randomize at the policy unit** | If a treatment applies to every user in a location (e.g., a market-wide earnings guarantee), randomize at the location (market) level — not the individual level. Individual-level randomization within the same market violates SUTVA: treated and control Dashers compete for the same order queue, so treatment spills over into control. Clean design: assign whole markets to treatment vs. control, matched on relevant confounders. |
 
 ---
 
